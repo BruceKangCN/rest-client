@@ -1,8 +1,8 @@
+import { sprintf } from "@std/fmt/printf";
 import "@std/dotenv/load";
 import {
     assert,
     assertEquals,
-    assertExists,
     assertGreater,
     assertInstanceOf,
     assertThrows,
@@ -103,11 +103,30 @@ Deno.test(async function testRestClientRequestsWithAuth(t) {
 
     // test POST, also do login, always runs before other steps
     {
+        const fmt = [
+            "%s not set, skip authentication tests.",
+            "did you forget to set `%s` environment variable?",
+        ].join(" ");
+
         const email = Deno.env.get("REALWORLD_USER_EMAIL");
-        assertExists(email);
+        if (email === undefined) {
+            console.warn(sprintf(
+                fmt,
+                "user email",
+                "REALWORLD_USER_EMAIL",
+            ));
+            return;
+        }
 
         const password = Deno.env.get("REALWORLD_USER_PASSWORD");
-        assertExists(password);
+        if (password === undefined) {
+            console.warn(sprintf(
+                fmt,
+                "user password",
+                "REALWORLD_USER_PASSWORD",
+            ));
+            return;
+        }
 
         const user: RealWorld.LoginUser = { email, password };
         const data: RealWorld.LoginUserRequest = { user };
