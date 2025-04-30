@@ -8,7 +8,7 @@ import {
     assertThrows,
 } from "@std/assert";
 
-import { RestClient, RESTError } from "./mod.ts";
+import { RestClient, RESTError } from "@/mod.ts";
 import * as RealWorld from "./real_world.ts";
 
 Deno.test(async function testRestClientOptions(t) {
@@ -79,13 +79,24 @@ Deno.test(async function testRestClientRequestsWithoutAuth(t) {
     await t.step(async function users() {
         assertThrows(await client.get("./users"));
 
-        const data: RealWorld.NewUserRequest = {
-            user: {
-                username: "foo",
-                "email": "foo@example.com",
-                password: "abc123",
-            },
-        };
+        const username = Deno.env.get("REALWORLD_USER_USERNAME");
+        if (username === undefined) {
+            return;
+        }
+
+        const email = Deno.env.get("REALWORLD_USER_EMAIL");
+        if (email === undefined) {
+            return;
+        }
+
+        const password = Deno.env.get("REALWORLD_USER_PASSWORD");
+        if (password === undefined) {
+            return;
+        }
+
+        const user: RealWorld.NewUser = { username, email, password };
+        const data: RealWorld.NewUserRequest = { user };
+
         try {
             await client.post("./users", undefined, data);
         } catch (err) {

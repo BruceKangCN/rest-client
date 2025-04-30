@@ -4,7 +4,7 @@
     "license": "MIT",
     "exports": "./src/mod.ts",
     "tasks": {
-        "dev": "deno run --watch main.ts"
+        "test": "deno test -RWE --allow-net"
     },
     "imports": {
         "@/": "./src/",
