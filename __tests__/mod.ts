@@ -1,4 +1,4 @@
-import { RestClient } from "@bruce/rest-client";
+import { RestClient } from "@/mod.ts";
 
 Deno.test(async function testRestClient() {
     const client = new RestClient("http://localhost:5173/api");

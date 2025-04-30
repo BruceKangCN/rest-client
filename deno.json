@@ -7,7 +7,7 @@
         "dev": "deno run --watch main.ts"
     },
     "imports": {
-        "@bruce/rest-client": "./src/mod.ts",
+        "@/": "./src/",
         "@std/assert": "jsr:@std/assert@1"
     },
     "fmt": {
