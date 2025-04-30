@@ -1,4 +1,7 @@
 {
+    "version": "1.0.0",
+    "name": "@bruce/rest-client",
+    "license": "MIT",
     "tasks": {
         "dev": "deno run --watch main.ts"
     },

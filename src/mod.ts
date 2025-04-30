@@ -12,6 +12,27 @@ export type HTTPMethod =
     | "TRACE"
     | "PATCH";
 
+// deno-lint-ignore no-explicit-any
+export class RESTError<T = any> extends Error {
+    /**
+     * response status code
+     */
+    status: number;
+
+    /**
+     * JSON parsed response body
+     */
+    data: T;
+
+    constructor(status: number, data: T) {
+        const msg = `request respond with status ${status}`;
+        super(msg)
+
+        this.status = status;
+        this.data = data;
+    }
+}
+
 export class RestClient {
     baseURL: string;
     defaultOptions: RequestInit;
@@ -34,12 +55,11 @@ export class RestClient {
      * send a REST request
      */
     // deno-lint-ignore no-explicit-any
-    async #send<T = any>(
+    async #send<T = any, U = any>(
         method: HTTPMethod,
         path: string,
         params?: URLSearchParams,
-        // deno-lint-ignore no-explicit-any
-        data?: any,
+        data?: U,
         options?: RequestInit,
     ): Promise<T> {
         const url = this.#createRequestURL(path, params);
@@ -57,8 +77,7 @@ export class RestClient {
         const res = await fetch(url, opt);
 
         if (!res.ok) {
-            const msg = await res.text();
-            throw Error(msg);
+            throw new RESTError(res.status, await res.json())
         }
 
         return await res.json();
