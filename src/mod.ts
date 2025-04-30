@@ -1,6 +1,5 @@
 import { join } from "node:path";
 
-
 export type HTTPMethod =
     | "GET"
     | "HEAD"
@@ -26,7 +25,7 @@ export class RESTError<T = any> extends Error {
 
     constructor(status: number, data: T) {
         const msg = `request respond with status ${status}`;
-        super(msg)
+        super(msg);
 
         this.status = status;
         this.data = data;
@@ -77,7 +76,7 @@ export class RestClient {
         const res = await fetch(url, opt);
 
         if (!res.ok) {
-            throw new RESTError(res.status, await res.json())
+            throw new RESTError(res.status, await res.json());
         }
 
         return await res.json();

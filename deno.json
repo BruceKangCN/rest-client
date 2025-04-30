@@ -2,6 +2,7 @@
     "version": "1.0.0",
     "name": "@bruce/rest-client",
     "license": "MIT",
+    "exports": "./src/mod.ts",
     "tasks": {
         "dev": "deno run --watch main.ts"
     },
