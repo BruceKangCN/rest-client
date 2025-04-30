@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { deepMerge } from "@cross/deepmerge";
 
 export type HTTPMethod =
     | "GET"
@@ -11,24 +11,17 @@ export type HTTPMethod =
     | "TRACE"
     | "PATCH";
 
-// deno-lint-ignore no-explicit-any
-export class RESTError<T = any> extends Error {
-    /**
-     * response status code
-     */
-    status: number;
+export class RESTError extends Error {
+    request: Request;
+    response: Response;
 
-    /**
-     * JSON parsed response body
-     */
-    data: T;
-
-    constructor(status: number, data: T) {
-        const msg = `request respond with status ${status}`;
+    constructor(req: Request, res: Response) {
+        const msg =
+            `request "${req.method} ${req.url}" respond with status ${res.status}`;
         super(msg);
 
-        this.status = status;
-        this.data = data;
+        this.request = req;
+        this.response = res;
     }
 }
 
@@ -46,8 +39,17 @@ export class RestClient {
      *
      * this can be used to set authentication bearer header.
      */
-    updateOptions(options: RequestInit) {
-        this.defaultOptions = { ...this.defaultOptions, ...options };
+    updateOptions(options: RequestInit): void {
+        this.defaultOptions = deepMerge(this.defaultOptions, options);
+    }
+
+    /**
+     * update the value of `Authentication` header in default options using `token`
+     */
+    auth(token: string): void {
+        const headers = { Authentication: token };
+        const opt: RequestInit = { headers };
+        this.updateOptions(opt);
     }
 
     /**
@@ -66,26 +68,24 @@ export class RestClient {
         opt.method = method;
 
         if (data) {
-            const headers = new Headers(opt.headers);
-            headers.set("Content-Type", "application/json");
-            opt.headers = headers;
+            const headers = { "Content-Type": "application/json" };
+            opt.headers = deepMerge(opt.headers, headers);
 
             opt.body = JSON.stringify(data);
         }
 
-        const res = await fetch(url, opt);
+        const req = new Request(url, opt);
+        const res = await fetch(req);
 
         if (!res.ok) {
-            throw new RESTError(res.status, await res.json());
+            throw new RESTError(req, res);
         }
 
         return await res.json();
     }
 
     #createRequestURL(path: string, params?: URLSearchParams): URL {
-        const url = new URL(this.baseURL);
-
-        url.pathname = join(url.pathname, path);
+        const url = new URL(path, this.baseURL);
         url.search = params?.toString() ?? "";
 
         return url;

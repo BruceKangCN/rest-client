@@ -1,0 +1,12 @@
+node_modules
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
