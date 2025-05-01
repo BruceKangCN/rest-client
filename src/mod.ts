@@ -82,16 +82,29 @@ export class RESTClient {
     }
 
     /**
-     * send a REST request
+     * send a REST request, returns Response.
+     *
+     * if response is not ok, a `RESTError` is throwed.
+     *
+     * @see RESTError
+     * @see get
+     * @see head
+     * @see post
+     * @see put
+     * @see patch
+     * @see delete
+     * @see options
+     * @see connect
+     * @see trace
      */
     // deno-lint-ignore no-explicit-any
-    async #send<T = any, U = any>(
+    async send<T = any>(
         method: HTTPMethod,
         path: string,
         params?: URLSearchParams,
-        data?: U,
+        data?: T,
         options?: RequestInit,
-    ): Promise<T> {
+    ): Promise<Response> {
         const url = this.#createRequestURL(path, params);
         const opt: RequestInit = { ...options };
         opt.method = method;
@@ -110,10 +123,21 @@ export class RESTClient {
             throw new RESTError(req, res);
         }
 
-        if (req.method === "HEAD") {
-            return undefined as T;
-        }
+        return res;
+    }
 
+    /**
+     * send a REST request
+     */
+    // deno-lint-ignore no-explicit-any
+    async #getParsedResponseBody<T = any, U = any>(
+        method: HTTPMethod,
+        path: string,
+        params?: URLSearchParams,
+        data?: U,
+        options?: RequestInit,
+    ): Promise<T> {
+        const res = await this.send(method, path, params, data, options);
         return await res.json();
     }
 
@@ -138,18 +162,25 @@ export class RESTClient {
         params?: URLSearchParams,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("GET", path, params, undefined, options);
+        return await this.#getParsedResponseBody(
+            "GET",
+            path,
+            params,
+            undefined,
+            options,
+        );
     }
 
     /**
-     * send a HEAD request
+     * send a HEAD request, returns response headers
      */
     async head(
         path: string,
         params?: URLSearchParams,
         options?: RequestInit,
-    ): Promise<void> {
-        return await this.#send("HEAD", path, params, undefined, options);
+    ): Promise<Headers> {
+        const res = await this.send("HEAD", path, params, undefined, options);
+        return res.headers;
     }
 
     /**
@@ -162,7 +193,13 @@ export class RESTClient {
         data?: U,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("POST", path, params, data, options);
+        return await this.#getParsedResponseBody(
+            "POST",
+            path,
+            params,
+            data,
+            options,
+        );
     }
 
     /**
@@ -175,7 +212,13 @@ export class RESTClient {
         data?: U,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("PUT", path, params, data, options);
+        return await this.#getParsedResponseBody(
+            "PUT",
+            path,
+            params,
+            data,
+            options,
+        );
     }
 
     /**
@@ -190,7 +233,13 @@ export class RESTClient {
         data?: U,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("DELETE", path, params, data, options);
+        return await this.#getParsedResponseBody(
+            "DELETE",
+            path,
+            params,
+            data,
+            options,
+        );
     }
 
     /**
@@ -203,7 +252,13 @@ export class RESTClient {
         data?: U,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("PATCH", path, params, data, options);
+        return await this.#getParsedResponseBody(
+            "PATCH",
+            path,
+            params,
+            data,
+            options,
+        );
     }
 
     /**
@@ -218,7 +273,13 @@ export class RESTClient {
         data?: U,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("OPTIONS", path, params, data, options);
+        return await this.#getParsedResponseBody(
+            "OPTIONS",
+            path,
+            params,
+            data,
+            options,
+        );
     }
 
     /**
@@ -230,7 +291,13 @@ export class RESTClient {
         params?: URLSearchParams,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("CONNECT", path, params, undefined, options);
+        return await this.#getParsedResponseBody(
+            "CONNECT",
+            path,
+            params,
+            undefined,
+            options,
+        );
     }
 
     /**
@@ -244,6 +311,12 @@ export class RESTClient {
         params?: URLSearchParams,
         options?: RequestInit,
     ): Promise<T> {
-        return await this.#send("TRACE", path, params, undefined, options);
+        return await this.#getParsedResponseBody(
+            "TRACE",
+            path,
+            params,
+            undefined,
+            options,
+        );
     }
 }

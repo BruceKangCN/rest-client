@@ -29,6 +29,9 @@ A simple `fetch` based REST client.
    const baz: any = await client.post("./bar", params, data, options);
    ```
 
+Note: for "HEAD" requests, response headers are returned instead of response
+body.
+
 ## Tests
 
 set environment variables used in tests:
@@ -58,3 +61,9 @@ $ deno test -RWE --allow-net
 $ # or using the `test` task
 $ deno task test
 ```
+
+### GitHub Workflows
+
+to run tests during GitHub workflows, set repository variable `RUN_TEST` to a
+value other than "0". You also need to set repository secrets coresponding to
+environment variables used in local tests.
