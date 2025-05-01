@@ -8,13 +8,13 @@ import {
     assertThrows,
 } from "@std/assert";
 
-import { RestClient, RESTError } from "@/mod.ts";
+import { RESTClient, RESTError } from "@/mod.ts";
 import * as RealWorld from "./real_world.ts";
 
 Deno.test(async function testRestClientOptions(t) {
     await t.step(function testUpdateOptions() {
         const defaultHeaders = { "Content-Type": "application/json" };
-        const client = new RestClient(undefined, { headers: defaultHeaders });
+        const client = new RESTClient(undefined, { headers: defaultHeaders });
 
         const newHeaderKey = "Accept";
         const newHeaderValue = "application/json";
@@ -36,7 +36,7 @@ Deno.test(async function testRestClientOptions(t) {
             "Content-Type": "application/json",
             "Accept": "application/json",
         };
-        const client = new RestClient(undefined, { headers: defaultHeaders });
+        const client = new RESTClient(undefined, { headers: defaultHeaders });
         const token = "Bearer abc123";
 
         client.auth(token);
@@ -49,7 +49,7 @@ Deno.test(async function testRestClientRequestsWithoutAuth(t) {
     const key = "REALWORLD_BASE_URL";
     const defaultBaseURL = "https://api.realworld.io/api/";
     const baseURL = Deno.env.get(key) ?? defaultBaseURL;
-    const client = new RestClient(baseURL);
+    const client = new RESTClient(baseURL);
 
     // test GET with no parameter
     await t.step(async function tags() {
@@ -110,7 +110,7 @@ Deno.test(async function testRestClientRequestsWithAuth(t) {
     const key = "REALWORLD_BASE_URL";
     const defaultBaseURL = "https://api.realworld.io/api/";
     const baseURL = Deno.env.get(key) ?? defaultBaseURL;
-    const client = new RestClient(baseURL);
+    const client = new RESTClient(baseURL);
 
     // test POST, also do login, always runs before other steps
     {

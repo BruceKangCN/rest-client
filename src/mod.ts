@@ -25,7 +25,7 @@ export class RESTError extends Error {
     }
 }
 
-export class RestClient {
+export class RESTClient {
     baseURL: string;
     defaultOptions: RequestInit;
 

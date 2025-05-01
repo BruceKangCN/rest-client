@@ -7,13 +7,13 @@ A simple `fetch` based REST client.
 1. create a client:
 
    ```ts
-   import { RestClient } from "@bruce/rest-client";
+   import { RESTClient } from "@bruce/rest-client";
 
-   const client = new RestClient();
+   const client = new RESTClient();
 
    // or with baseURL / default options
-   const clientWithURL = new RestClient(baseURL);
-   const clientWithOpt = new RestClient(baseURL, defaultOptions);
+   const clientWithURL = new RESTClient(baseURL);
+   const clientWithOpt = new RESTClient(baseURL, defaultOptions);
    ```
 
 2. send requests using the client:
