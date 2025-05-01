@@ -44,8 +44,13 @@ export class RESTError extends Error {
  * "Content-Type" to "application/json".
  *
  * on response, if success and response is ok, it automatically parse response
- * body to object. if response is not ok, `RESTError` is throwed. for "HEAD"
- * request, response body is ignored and `undefined` is returned.
+ * body to object. if response is not ok, `RESTError` is throwed.
+ *
+ * Notes:
+ * - for "HEAD" requests, response headers are returned instead of response body.
+ * - for "OPTIONS" requests, the "Allow" response header, instead of response body,
+ *   is returned, as an array of string.
+ * - "CONNECT" requests do not return data.
  *
  * errors during fetch (e.g. `AbortError`, `NotAllowedError`) are throwed as-is.
  *
@@ -264,34 +269,47 @@ export class RESTClient {
     /**
      * send an OPTIONS request
      *
+     * returns allowed methods as an array of string. if "Allow" header not
+     * exists in response, an empty array is returned.
+     *
      * Note: request body may be ignored by server.
      */
     // deno-lint-ignore no-explicit-any
-    async options<T = any, U = any>(
+    async options<T = any>(
         path: string,
         params?: URLSearchParams,
-        data?: U,
+        data?: T,
         options?: RequestInit,
-    ): Promise<T> {
-        return await this.#getParsedResponseBody(
+    ): Promise<HTTPMethod[]> {
+        const res = await this.send(
             "OPTIONS",
             path,
             params,
             data,
             options,
         );
+        const allow = res.headers.get("Allow");
+
+        if (allow === null) {
+            console.warn({
+                msg: 'response does not have an "Allow" header',
+                response: res,
+            });
+            return [];
+        }
+
+        return allow.split(/\s*,\s*/) as HTTPMethod[];
     }
 
     /**
      * send a CONNECT request
      */
-    // deno-lint-ignore no-explicit-any
-    async connect<T = any>(
+    async connect(
         path: string,
         params?: URLSearchParams,
         options?: RequestInit,
-    ): Promise<T> {
-        return await this.#getParsedResponseBody(
+    ): Promise<void> {
+        await this.send(
             "CONNECT",
             path,
             params,

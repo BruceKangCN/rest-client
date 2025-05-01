@@ -29,8 +29,12 @@ A simple `fetch` based REST client.
    const baz: any = await client.post("./bar", params, data, options);
    ```
 
-Note: for "HEAD" requests, response headers are returned instead of response
-body.
+Notes:
+
+- for "HEAD" requests, response headers are returned instead of response body.
+- for "OPTIONS" requests, the "Allow" response header, instead of response body,
+  is returned, as an array of string.
+- "CONNECT" requests do not return data.
 
 ## Tests
 
