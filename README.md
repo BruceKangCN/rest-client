@@ -14,6 +14,12 @@ A simple `fetch` based REST client.
    // or with baseURL / default options
    const clientWithURL = new RESTClient(baseURL);
    const clientWithOpt = new RESTClient(baseURL, defaultOptions);
+   // you can even create a client with a customized fetch function
+   const myFetch = (url) => {
+       console.log({url});
+       return fetch(url);
+   }
+   const clientWithFetchFn(baseURL, defaultOptions, myFetch);
    ```
 
 2. send requests using the client:
@@ -35,6 +41,41 @@ Notes:
 - for "OPTIONS" requests, the "Allow" response header, instead of response body,
   is returned, as an array of string.
 - "CONNECT" requests do not return data.
+
+### Create client for a resource
+
+You can extends `RESTClient` to create your own client for a specific REST
+resource:
+
+```ts
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+interface Post {
+    id: number;
+    title: string;
+    content: string;
+}
+
+class PostClient extends RESTClient {
+    readonly id: number;
+
+    constructor(id: number) {
+        const baseURL = `${API_BASE_URL}/posts/${id}`;
+        super(baseURL);
+    }
+
+    override async get(
+        params?: URLSearchParams,
+        options?: RequestInit,
+    ): Promise<Post> {
+        return await super.get(
+            this.baseURL,
+            params,
+            options,
+        );
+    }
+}
+```
 
 ## Tests
 

@@ -57,13 +57,20 @@ export class RESTError extends Error {
  * @see RESTError
  */
 export class RESTClient {
-    baseURL: string;
+    readonly fetchFn: typeof fetch;
+    readonly baseURL: string;
     defaultOptions: RequestInit;
 
     /**
-     * construct a REST client with optional base URL and default options.
+     * construct a REST client with optional base URL, default options and a
+     * customized fetch function.
      */
-    constructor(baseURL?: string, defaultOptions?: RequestInit) {
+    constructor(
+        baseURL?: string,
+        defaultOptions?: RequestInit,
+        fetchFn?: typeof fetch,
+    ) {
+        this.fetchFn = fetchFn ?? fetch;
         this.baseURL = baseURL ?? "";
         this.defaultOptions = { ...defaultOptions };
     }
