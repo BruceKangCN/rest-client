@@ -44,8 +44,7 @@ Notes:
 
 ### Create client for a resource
 
-You can extends `RESTClient` to create your own client for a specific REST
-resource:
+You can extends `RESTClient` to create your own client:
 
 ```ts
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -56,23 +55,13 @@ interface Post {
     content: string;
 }
 
-class PostClient extends RESTClient {
-    readonly id: number;
-
-    constructor(id: number) {
-        const baseURL = `${API_BASE_URL}/posts/${id}`;
-        super(baseURL);
+class MyClient extends RESTClient {
+    constructor() {
+        super(API_BASE_URL);
     }
 
-    override async get(
-        params?: URLSearchParams,
-        options?: RequestInit,
-    ): Promise<Post> {
-        return await super.get(
-            this.baseURL,
-            params,
-            options,
-        );
+    async getPost(id: number): Promise<Post> {
+        return await super.get(`/post/${id}`);
     }
 }
 ```
