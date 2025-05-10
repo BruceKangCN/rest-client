@@ -61,7 +61,7 @@ class MyClient extends RESTClient {
     }
 
     async getPost(id: number): Promise<Post> {
-        return await super.get(`/post/${id}`);
+        return await super.get(`./post/${id}`);
     }
 }
 ```

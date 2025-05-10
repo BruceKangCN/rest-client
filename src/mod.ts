@@ -58,7 +58,7 @@ export class RESTError extends Error {
  */
 export class RESTClient {
     readonly fetchFn: typeof fetch;
-    readonly baseURL: string;
+    readonly baseURL: URL;
     defaultOptions: RequestInit;
 
     /**
@@ -66,12 +66,12 @@ export class RESTClient {
      * customized fetch function.
      */
     constructor(
-        baseURL?: string,
+        baseURL?: string | URL,
         defaultOptions?: RequestInit,
         fetchFn?: typeof fetch,
     ) {
         this.fetchFn = fetchFn ?? fetch;
-        this.baseURL = baseURL ?? "";
+        this.baseURL = new URL(baseURL ?? "http://localhost:80");
         this.defaultOptions = { ...defaultOptions };
     }
 
@@ -112,7 +112,7 @@ export class RESTClient {
     // deno-lint-ignore no-explicit-any
     async send<T = any>(
         method: HTTPMethod,
-        path: string,
+        path: string | URL,
         params?: URLSearchParams,
         data?: T,
         options?: RequestInit,
@@ -158,7 +158,7 @@ export class RESTClient {
      * the URL is constructed the resource path `path` and search parameters
      * `params` appended to `baseURL` of the client.
      */
-    #createRequestURL(path: string, params?: URLSearchParams): URL {
+    #createRequestURL(path: string | URL, params?: URLSearchParams): URL {
         const url = new URL(path, this.baseURL);
         url.search = params?.toString() ?? "";
 
