@@ -1,11 +1,12 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@cross/deepmerge@1": "1.0.0",
     "jsr:@std/assert@1": "1.0.13",
     "jsr:@std/dotenv@~0.225.3": "0.225.3",
     "jsr:@std/fmt@^1.0.7": "1.0.7",
-    "jsr:@std/internal@^1.0.6": "1.0.6"
+    "jsr:@std/internal@^1.0.6": "1.0.6",
+    "npm:url-toolkit@^2.2.5": "2.2.5"
   },
   "jsr": {
     "@cross/deepmerge@1.0.0": {
@@ -27,12 +28,21 @@
       "integrity": "9533b128f230f73bd209408bb07a4b12f8d4255ab2a4d22a1fd6d87304aca9a4"
     }
   },
+  "npm": {
+    "url-toolkit@2.2.5": {
+      "integrity": "sha512-mtN6xk+Nac+oyJ/PrI7tzfmomRVNFIWKUbG8jdYFt52hxbiReFAXIjYskvu64/dvuW71IcB7lV8l0HvZMac6Jg=="
+    }
+  },
+  "remote": {
+    "https://cdn.jsdelivr.net/npm/url-toolkit@2": "ab97563fd1d60e64eb35ec120b71aeb6b82c45e179e5191ba274df9077d3b5e9"
+  },
   "workspace": {
     "dependencies": [
       "jsr:@cross/deepmerge@1",
       "jsr:@std/assert@1",
       "jsr:@std/dotenv@~0.225.3",
-      "jsr:@std/fmt@^1.0.7"
+      "jsr:@std/fmt@^1.0.7",
+      "npm:url-toolkit@^2.2.5"
     ]
   }
 }

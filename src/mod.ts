@@ -1,4 +1,5 @@
 import { deepMerge } from "@cross/deepmerge";
+import { buildAbsoluteURL } from "url-toolkit";
 
 /**
  * HTTP request methods
@@ -26,8 +27,10 @@ export class RESTError extends Error {
     response: Response;
 
     constructor(req: Request, res: Response) {
-        const msg =
-            `request "${req.method} ${req.url}" respond with status ${res.status}`;
+        const { method, url } = req;
+        const { status } = res;
+        const msg = `request "${method} ${url}" respond with status ${status}`;
+
         super(msg);
 
         this.request = req;
@@ -58,7 +61,7 @@ export class RESTError extends Error {
  */
 export class RESTClient {
     readonly fetchFn: typeof fetch;
-    readonly baseURL: URL;
+    readonly baseURL: string;
     defaultOptions: RequestInit;
 
     /**
@@ -66,12 +69,12 @@ export class RESTClient {
      * customized fetch function.
      */
     constructor(
-        baseURL?: string | URL,
+        baseURL?: string,
         defaultOptions?: RequestInit,
         fetchFn?: typeof fetch,
     ) {
         this.fetchFn = fetchFn ?? fetch;
-        this.baseURL = new URL(baseURL ?? "http://localhost:80");
+        this.baseURL = baseURL ?? "";
         this.defaultOptions = { ...defaultOptions };
     }
 
@@ -112,12 +115,15 @@ export class RESTClient {
     // deno-lint-ignore no-explicit-any
     async send<T = any>(
         method: HTTPMethod,
-        path: string | URL,
+        path: string,
         params?: URLSearchParams,
         data?: T,
         options?: RequestInit,
     ): Promise<Response> {
-        const url = this.#createRequestURL(path, params);
+        const search = params ? `?${params.toString()}` : "";
+        const relative = `${path}${search}`;
+        const url = buildAbsoluteURL(this.baseURL, relative);
+
         const opt: RequestInit = { ...options };
         opt.method = method;
 
@@ -151,18 +157,6 @@ export class RESTClient {
     ): Promise<T> {
         const res = await this.send(method, path, params, data, options);
         return await res.json();
-    }
-
-    /**
-     * construct a request URL.
-     * the URL is constructed the resource path `path` and search parameters
-     * `params` appended to `baseURL` of the client.
-     */
-    #createRequestURL(path: string | URL, params?: URLSearchParams): URL {
-        const url = new URL(path, this.baseURL);
-        url.search = params?.toString() ?? "";
-
-        return url;
     }
 
     /**
