@@ -20,20 +20,22 @@ export type HTTPMethod =
  * @see RESTClient
  */
 export class RESTError extends Error {
-    /** REST request coresponding to the response */
-    request: Request;
+    /** REST request method to the response */
+    readonly method: HTTPMethod;
+    /** REST request URL to the response */
+    readonly url: string;
 
     /** REST response that respond the error */
-    response: Response;
+    readonly response: Response;
 
-    constructor(req: Request, res: Response) {
-        const { method, url } = req;
+    constructor(method: HTTPMethod, url: string, res: Response) {
         const { status } = res;
         const msg = `request "${method} ${url}" respond with status ${status}`;
 
         super(msg);
 
-        this.request = req;
+        this.method = method;
+        this.url = url;
         this.response = res;
     }
 }
@@ -134,11 +136,10 @@ export class RESTClient {
             opt.body = JSON.stringify(data);
         }
 
-        const req = new Request(url, opt);
-        const res = await fetch(req);
+        const res = await this.fetchFn(url, opt);
 
         if (!res.ok) {
-            throw new RESTError(req, res);
+            throw new RESTError(method, url, res);
         }
 
         return res;
